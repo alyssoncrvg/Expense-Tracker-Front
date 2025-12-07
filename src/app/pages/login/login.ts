@@ -43,8 +43,7 @@ export class LoginComponent {
       )
       .subscribe({
         next: () => {
-          alert('Login bem-sucedido!');
-          // this.router.navigate(['/home']);
+          this.router.navigate(['/dashboard']);
         },
         error: (err) => {
           this.errorMessage = err.error?.message || err.message || 'Ocorreu um erro desconhecido.';
