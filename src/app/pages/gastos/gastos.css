@@ -1,0 +1,15 @@
+
+.p-selectbutton .p-button {
+    border: none !important;
+    background: transparent;
+    color: #6b7280;
+    font-weight: 500;
+    transition: all 0.2s;
+    border-radius: 0.5rem; 
+}
+
+.p-selectbutton .p-button.p-highlight {
+    background: white !important;
+    color: #111827 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
