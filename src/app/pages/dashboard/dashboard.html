@@ -1,11 +1,88 @@
-<div class="mb-6">
-  <h2 class="text-3xl font-bold text-gray-800">Dashboard</h2>
-  <p class="text-gray-600">Visão geral das suas finanças</p>
+<div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div>
+    <h2 class="text-3xl font-bold text-gray-800 tracking-tight">Dashboard Familiar</h2>
+    <p class="text-gray-500">Visão completa das finanças da casa</p>
+  </div>
+  <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm shadow-blue-200">
+    + Nova Despesa
+  </button>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-  <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-    <h3 class="text-gray-500 text-sm font-medium">Saldo Atual</h3>
-    <p class="text-2xl font-bold text-green-600 mt-2">R$ 12.450,00</p>
+@if (isLoading()) {
+  <app-loader message="Sincronizando dados da família..."></app-loader>
+} 
+
+@else {
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-shadow">
+      <div class="absolute right-0 top-0 w-24 h-24 bg-green-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+      <h3 class="text-gray-500 text-xs font-bold uppercase tracking-wider relative z-10">Saldo Atual</h3>
+      <p class="text-3xl font-bold text-gray-800 mt-2 relative z-10">R$ 14.500,00</p>
+      <span class="inline-flex items-center gap-1 text-green-600 text-xs font-medium mt-3 bg-green-50 px-2 py-1 rounded-full relative z-10">
+        <i class="pi pi-arrow-up text-[10px]"></i> 12% vs mês anterior
+      </span>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+      <h3 class="text-gray-500 text-xs font-bold uppercase tracking-wider">Receitas (Jun)</h3>
+      <p class="text-2xl font-bold text-green-600 mt-2">R$ 16.000,00</p>
+      <div class="w-full bg-gray-100 h-1.5 rounded-full mt-4 overflow-hidden">
+        <div class="bg-green-500 h-full rounded-full" style="width: 85%"></div>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+      <h3 class="text-gray-500 text-xs font-bold uppercase tracking-wider">Despesas (Jun)</h3>
+      <p class="text-2xl font-bold text-red-600 mt-2">R$ 10.500,00</p>
+      <div class="w-full bg-gray-100 h-1.5 rounded-full mt-4 overflow-hidden">
+        <div class="bg-red-500 h-full rounded-full" style="width: 65%"></div>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+      <h3 class="text-gray-500 text-xs font-bold uppercase tracking-wider">Investimentos</h3>
+      <p class="text-2xl font-bold text-blue-600 mt-2">R$ 4.000,00</p>
+      <span class="text-gray-400 text-xs mt-2 block">Meta mensal atingida!</span>
+    </div>
   </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+    
+    <div class="lg:col-span-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-gray-800 font-bold text-lg">Fluxo de Caixa Semestral</h3>
+        <i class="pi pi-ellipsis-v text-gray-400 cursor-pointer"></i>
+      </div>
+      <p-chart type="bar" [data]="cashFlowData" [options]="basicOptions" height="320px"></p-chart>
+    </div>
+
+    <div class="lg:col-span-4 flex flex-col gap-6">
+      
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex-1">
+        <h3 class="text-gray-800 font-bold text-lg mb-4">Gastos por Pessoa</h3>
+        <p-chart type="bar" [data]="memberData" [options]="horizontalOptions" height="200px"></p-chart>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex-1">
+        <h3 class="text-gray-800 font-bold text-lg mb-4">Top Categorias</h3>
+        <div class="flex justify-center">
+          <p-chart type="doughnut" [data]="categoryData" height="180px" [options]="{ plugins: { legend: { display: false } } }"></p-chart>
+        </div>
+      </div>
+
+    </div>
   </div>
+
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+      <h3 class="text-gray-800 font-bold text-lg">Últimas Transações</h3>
+      <button class="text-blue-600 text-sm font-medium hover:underline">Ver tudo</button>
+    </div>
+    
+    <div class="p-8 text-center text-gray-400 bg-gray-50/50">
+      <i class="pi pi-table text-4xl mb-3 block opacity-20"></i>
+      <p>As tabelas detalhadas ficarão aqui...</p>
+    </div>
+  </div>
+}
