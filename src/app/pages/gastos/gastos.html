@@ -15,9 +15,8 @@
     </div>
     <button 
       (click)="showDialog()" 
-      class="group bg-gray-900 text-white px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-all shadow-lg shadow-gray-200 flex items-center gap-2 text-sm font-medium active:scale-95">
-      <i class="pi pi-plus text-xs group-hover:rotate-90 transition-transform"></i> 
-      Nova Transação
+      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm shadow-blue-200">
+      + Nova Transação
     </button>
   </div>
 
@@ -207,7 +206,7 @@
       </small>
     </div>
 
-    <div class="flex justify-end gap-3 mt-4 pt-6 border-t border-gray-100">
+    <div class="flex justify-end gap-3 mt-4 py-6 border-t border-gray-100">
       <button 
         type="button" 
         pButton 
@@ -223,7 +222,7 @@
         [label]="isSubmitting() ? 'Salvando...' : 'Salvar Transação'" 
         [loading]="isSubmitting()" 
         [disabled]="transactionForm.invalid || isSubmitting()"
-        class="bg-gray-900 border-gray-900 hover:bg-gray-800 hover:border-gray-800 text-white shadow-lg shadow-gray-200 px-6 py-3 rounded-lg font-bold tracking-wide active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm shadow-blue-200 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
       </button>
     </div>
   </form>
