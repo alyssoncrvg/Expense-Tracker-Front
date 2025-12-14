@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura'; 
-
+import { MessageService } from 'primeng/api';
 import { authInterceptor } from './interceptors/auth.interceptor';
 import { routes } from './app.routes';
 
@@ -27,6 +27,7 @@ export const appConfig: ApplicationConfig = {
                 }
             }
         }
-    })
+    }),
+    MessageService
   ]
 };

@@ -12,7 +12,7 @@ import { Select } from 'primeng/select';
 import { LoaderComponent } from '../../component/loader/loader';
 import { CategoriesService } from '../../services/categoires/categories';
 import { Category } from '../../models/categorie.model';
-
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-gastos',
@@ -28,6 +28,7 @@ import { Category } from '../../models/categorie.model';
 export class Gastos implements OnInit {
   private fb = inject(FormBuilder);
   private categoriesService = inject(CategoriesService);
+  private messageService = inject(MessageService);
 
   isLoading = signal(true);
   displayModal = signal(false);
@@ -122,6 +123,13 @@ export class Gastos implements OnInit {
         },
         ...list
       ]);
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Sucesso',
+        detail: 'Transação salva com sucesso!',
+        life: 3000 // Tempo em ms para sumir
+      });
 
       this.isSubmitting.set(false);
       this.displayModal.set(false);
