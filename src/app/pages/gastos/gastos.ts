@@ -10,9 +10,11 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { DatePickerModule } from 'primeng/datepicker';
 import { Select } from 'primeng/select';
 import { LoaderComponent } from '../../component/loader/loader';
+import { MessageService } from 'primeng/api';
 import { CategoriesService } from '../../services/categoires/categories';
 import { Category } from '../../models/categorie.model';
-import { MessageService } from 'primeng/api';
+import { TransactionRequest } from '../../models/transaction.model';
+import { TransactionsService } from '../../services/transaction/transaction';
 
 @Component({
   selector: 'app-gastos',
@@ -28,6 +30,7 @@ import { MessageService } from 'primeng/api';
 export class Gastos implements OnInit {
   private fb = inject(FormBuilder);
   private categoriesService = inject(CategoriesService);
+  private transactionsService = inject(TransactionsService);
   private messageService = inject(MessageService);
 
   isLoading = signal(true);
@@ -36,7 +39,6 @@ export class Gastos implements OnInit {
 
   transactionForm!: FormGroup;
   transactions = signal<any[]>([]);
-
 
   typeOptions = [
     { label: 'Despesa', value: 'EXPENSE' },
@@ -63,26 +65,26 @@ export class Gastos implements OnInit {
 
   loadCategories() {
     this.categoriesService.getAll().subscribe({
-      next: (data) => {
-        this.categories.set(data);
-      },
-      error: (err) => {
-        console.error('Erro ao carregar categorias', err);
-        // Opcional: Mostrar um toast de erro
-      }
+      next: (data) => this.categories.set(data),
+      error: (err) => console.error('Erro categorias', err)
     });
   }
 
+
   loadTransactions() {
-    this.isLoading.set(true);
-    setTimeout(() => {
-      this.transactions.set([
-        { description: 'Supermercado Mensal', amount: 850.50, date: '2025-12-10', type: 'EXPENSE', category: { name: 'Alimentação' } },
-        { description: 'Salário', amount: 5000.00, date: '2025-12-05', type: 'INCOME', category: { name: 'Salário' } },
-      ]);
-      this.isLoading.set(false);
-    }, 1500);
+     this.isLoading.set(true);
+     this.transactionsService.getAll().subscribe({
+       next: (data) => {
+         this.transactions.set(data);
+         this.isLoading.set(false);
+       },
+       error: (err) => {
+         console.error(err);
+         this.isLoading.set(false);
+       }
+     });
   }
+
 
   showDialog() {
     this.transactionForm.reset({
@@ -93,8 +95,6 @@ export class Gastos implements OnInit {
   }
 
   onSubmit() {
-    if (this.transactionForm.invalid) return;
-
     if (this.transactionForm.invalid) {
       this.transactionForm.markAllAsTouched();
       return;
@@ -103,36 +103,45 @@ export class Gastos implements OnInit {
     this.isSubmitting.set(true);
 
     const rawValue = this.transactionForm.value;
+    
     const formattedDate = rawValue.date instanceof Date
       ? rawValue.date.toISOString().split('T')[0]
       : rawValue.date;
 
-    const payload = {
+    const payload: TransactionRequest = {
       description: rawValue.description,
       amount: rawValue.amount,
       date: formattedDate,
       type: rawValue.type,
-      categoryId: rawValue.categoryId?.uuid 
+      categoryId: rawValue.categoryId?.uuid
     };
 
-    setTimeout(() => {
-      this.transactions.update(list => [
-        {
-          ...payload,
-          category: { name: rawValue.categoryId.name }
-        },
-        ...list
-      ]);
+    this.transactionsService.create(payload).subscribe({
+      next: (newTransaction) => {
+        this.transactions.update(list => [newTransaction, ...list]);
 
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Sucesso',
-        detail: 'Transação salva com sucesso!',
-        life: 3000 // Tempo em ms para sumir
-      });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Transação registrada com sucesso!',
+          life: 3000
+        });
 
-      this.isSubmitting.set(false);
-      this.displayModal.set(false);
-    }, 1500);
+        this.isSubmitting.set(false);
+        this.displayModal.set(false);
+        this.transactionForm.reset();
+      },
+      error: (err) => {
+        console.error('Erro ao salvar transação', err);
+        
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao salvar a transação. Tente novamente.'
+        });
+
+        this.isSubmitting.set(false);
+      }
+    });
   }
 }
