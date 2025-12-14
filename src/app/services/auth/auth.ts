@@ -2,8 +2,8 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
-import { LoginRequest, LoginResponse } from '../models/auth.model';
-import { environment } from '../../environments/environment';
+import { LoginRequest, LoginResponse } from '../../models/auth.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +33,7 @@ export class AuthService {
       catchError((err: HttpErrorResponse) => {
         let errorMessage = 'Ocorreu um erro inesperado';
         if (err.error && err.error.message) {
-          errorMessage = err.error.message; 
+          errorMessage = err.error.message;
         }
 
         return throwError(() => new Error(errorMessage));
