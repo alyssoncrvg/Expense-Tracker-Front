@@ -10,6 +10,8 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { DatePickerModule } from 'primeng/datepicker';
 import { Select } from 'primeng/select';
 import { LoaderComponent } from '../../component/loader/loader';
+import { CategoriesService } from '../../services/categoires/categories';
+import { Category } from '../../models/categorie.model';
 
 
 @Component({
@@ -25,6 +27,7 @@ import { LoaderComponent } from '../../component/loader/loader';
 })
 export class Gastos implements OnInit {
   private fb = inject(FormBuilder);
+  private categoriesService = inject(CategoriesService);
 
   isLoading = signal(true);
   displayModal = signal(false);
@@ -39,16 +42,12 @@ export class Gastos implements OnInit {
     { label: 'Receita', value: 'INCOME' }
   ];
 
-  categories = [
-    { name: 'Alimentação', uuid: 'cat-uuid-1' },
-    { name: 'Moradia', uuid: 'cat-uuid-2' },
-    { name: 'Transporte', uuid: 'cat-uuid-3' },
-    { name: 'Lazer', uuid: 'cat-uuid-4' }
-  ];
+  categories = signal<Category[]>([]);
 
   ngOnInit() {
     this.initForm();
     this.loadTransactions();
+    this.loadCategories();
   }
 
   initForm() {
@@ -58,6 +57,18 @@ export class Gastos implements OnInit {
       date: [new Date(), [Validators.required]],
       type: ['EXPENSE', [Validators.required]],
       categoryId: [null, [Validators.required]]
+    });
+  }
+
+  loadCategories() {
+    this.categoriesService.getAll().subscribe({
+      next: (data) => {
+        this.categories.set(data);
+      },
+      error: (err) => {
+        console.error('Erro ao carregar categorias', err);
+        // Opcional: Mostrar um toast de erro
+      }
     });
   }
 
@@ -100,7 +111,7 @@ export class Gastos implements OnInit {
       amount: rawValue.amount,
       date: formattedDate,
       type: rawValue.type,
-      categoryId: rawValue.categoryId.uuid
+      categoryId: rawValue.categoryId?.uuid 
     };
 
     setTimeout(() => {
