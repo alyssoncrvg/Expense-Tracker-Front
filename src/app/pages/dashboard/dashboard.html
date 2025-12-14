@@ -16,17 +16,29 @@
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-shadow">
-      <div class="absolute right-0 top-0 w-24 h-24 bg-green-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+      <div 
+        class="absolute right-0 top-0 w-24 h-24 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"
+        [ngClass]="{
+          'bg-green-50': balance() >= 0,
+          'bg-red-50': balance() < 0
+        }">
+      </div>
+
       <h3 class="text-gray-500 text-xs font-bold uppercase tracking-wider relative z-10">Saldo Atual</h3>
-      <p class="text-3xl font-bold text-gray-800 mt-2 relative z-10">R$ 14.500,00</p>
-      <span class="inline-flex items-center gap-1 text-green-600 text-xs font-medium mt-3 bg-green-50 px-2 py-1 rounded-full relative z-10">
-        <i class="pi pi-arrow-up text-[10px]"></i> 12% vs mês anterior
-      </span>
+      
+      <p 
+        class="text-3xl font-bold mt-2 relative z-10"
+        [ngClass]="{
+          'text-green-600': balance() >= 0,
+          'text-red-600': balance() < 0
+        }">
+        R$ {{ balance() | number:'1.2-2' }}
+      </p>
     </div>
 
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
       <h3 class="text-gray-500 text-xs font-bold uppercase tracking-wider">Receitas (Jun)</h3>
-      <p class="text-2xl font-bold text-green-600 mt-2">R$ 16.000,00</p>
+      <p class="text-2xl font-bold text-green-600 mt-2">R$ {{ monthlyIncome() }}</p>
       <div class="w-full bg-gray-100 h-1.5 rounded-full mt-4 overflow-hidden">
         <div class="bg-green-500 h-full rounded-full" style="width: 85%"></div>
       </div>
@@ -34,7 +46,7 @@
 
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
       <h3 class="text-gray-500 text-xs font-bold uppercase tracking-wider">Despesas (Jun)</h3>
-      <p class="text-2xl font-bold text-red-600 mt-2">R$ 10.500,00</p>
+      <p class="text-2xl font-bold text-red-600 mt-2">R$ {{ monthlyExpense() }}</p>
       <div class="w-full bg-gray-100 h-1.5 rounded-full mt-4 overflow-hidden">
         <div class="bg-red-500 h-full rounded-full" style="width: 65%"></div>
       </div>
@@ -77,12 +89,44 @@
   <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
     <div class="p-6 border-b border-gray-100 flex justify-between items-center">
       <h3 class="text-gray-800 font-bold text-lg">Últimas Transações</h3>
-      <button class="text-blue-600 text-sm font-medium hover:underline">Ver tudo</button>
     </div>
     
-    <div class="p-8 text-center text-gray-400 bg-gray-50/50">
-      <i class="pi pi-table text-4xl mb-3 block opacity-20"></i>
-      <p>As tabelas detalhadas ficarão aqui...</p>
-    </div>
-  </div>
+    <p-table [value]="lastTransactions()" [rows]="5">
+      <ng-template pTemplate="header">
+        <tr class="text-sm text-gray-500 border-b border-gray-100">
+          <th class="font-semibold py-4 px-4 text-left">Descrição</th>
+          <th class="font-semibold py-4 px-4 text-left">Categoria</th>
+          <th class="font-semibold py-4 px-4 text-left">Data</th>
+          <th class="font-semibold py-4 px-4 text-right">Valor</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-t>
+        <tr class="text-sm border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+          <td class="font-medium text-gray-700 py-4 px-4">{{ t.description }}</td>
+          
+          <td class="py-4 px-4">
+            <span class="px-2.5 py-1 bg-gray-100 rounded text-xs text-gray-600 font-medium">
+              {{ t.category?.name }}
+            </span>
+          </td>
+          
+          <td class="text-gray-500 py-4 px-4">{{ t.date | date:'dd/MM/yyyy' }}</td>
+          
+          <td class="text-right font-bold py-4 px-4" 
+              [ngClass]="t.type === 'INCOME' ? 'text-green-600' : 'text-red-600'">
+            {{ t.type === 'INCOME' ? '+' : '-' }} {{ t.amount | currency:'BRL' }}
+          </td>
+        </tr>
+      </ng-template>
+      
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="text-center py-8 text-gray-400 text-sm">
+            Nenhuma transação recente encontrada.
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+</div>
 }
