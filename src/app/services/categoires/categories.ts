@@ -18,4 +18,10 @@ export class CategoriesService {
       map(response => response.data)
     );
   }
+
+  create(name: string): Observable<Category> {
+    return this.http.post<ApiResponse<Category>>(this.apiUrl, { name }).pipe(
+      map(response => response.data)
+    );
+  }
 }

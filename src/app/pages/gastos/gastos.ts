@@ -34,10 +34,16 @@ export class Gastos implements OnInit {
   private messageService = inject(MessageService);
 
   isLoading = signal(true);
+  
   displayModal = signal(false);
+  displayCategoryModal = signal(false);
+  
   isSubmitting = signal(false);
+  isSubmittingCategory = signal(false);
 
   transactionForm!: FormGroup;
+  categoryForm!: FormGroup;
+
   transactions = signal<any[]>([]);
 
   typeOptions = [
@@ -48,18 +54,22 @@ export class Gastos implements OnInit {
   categories = signal<Category[]>([]);
 
   ngOnInit() {
-    this.initForm();
+    this.initForms();
     this.loadTransactions();
     this.loadCategories();
   }
 
-  initForm() {
+  initForms() {
     this.transactionForm = this.fb.group({
       description: ['', [Validators.required, Validators.minLength(3)]],
       amount: [null, [Validators.required, Validators.min(0.01)]],
       date: [new Date(), [Validators.required]],
       type: ['EXPENSE', [Validators.required]],
       categoryId: [null, [Validators.required]]
+    });
+
+    this.categoryForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(3)]]
     });
   }
 
@@ -69,7 +79,6 @@ export class Gastos implements OnInit {
       error: (err) => console.error('Erro categorias', err)
     });
   }
-
 
   loadTransactions() {
      this.isLoading.set(true);
@@ -84,7 +93,6 @@ export class Gastos implements OnInit {
        }
      });
   }
-
 
   showDialog() {
     this.transactionForm.reset({
@@ -119,28 +127,47 @@ export class Gastos implements OnInit {
     this.transactionsService.create(payload).subscribe({
       next: (newTransaction) => {
         this.transactions.update(list => [newTransaction, ...list]);
-
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Sucesso',
-          detail: 'Transação registrada com sucesso!',
-          life: 3000
-        });
-
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Transação registrada!' });
         this.isSubmitting.set(false);
         this.displayModal.set(false);
         this.transactionForm.reset();
       },
       error: (err) => {
         console.error('Erro ao salvar transação', err);
-        
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao salvar a transação. Tente novamente.'
-        });
-
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao salvar a transação.' });
         this.isSubmitting.set(false);
+      }
+    });
+  }
+
+  showCategoryDialog() {
+    this.categoryForm.reset();
+    this.displayCategoryModal.set(true);
+  }
+
+  onCategorySubmit() {
+    if (this.categoryForm.invalid) {
+      this.categoryForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSubmittingCategory.set(true);
+    const categoryName = this.categoryForm.get('name')?.value;
+
+    this.categoriesService.create(categoryName).subscribe({
+      next: (newCategory) => {
+        this.categories.update(list => [...list, newCategory]);
+        
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Categoria criada com sucesso!' });
+        
+        this.isSubmittingCategory.set(false);
+        this.displayCategoryModal.set(false);
+        this.categoryForm.reset();
+      },
+      error: (err) => {
+        console.error('Erro ao criar categoria', err);
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message || 'Falha ao criar a categoria.' });
+        this.isSubmittingCategory.set(false);
       }
     });
   }

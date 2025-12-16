@@ -13,11 +13,19 @@
       <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Transações</h2>
       <p class="text-sm text-gray-500 mt-1">Acompanhe o fluxo financeiro da família</p>
     </div>
-    <button 
-      (click)="showDialog()" 
-      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm shadow-blue-200">
-      + Nova Transação
-    </button>
+    <div class="flex gap-3">
+      <button 
+        (click)="showCategoryDialog()" 
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm shadow-blue-200">
+        + Nova Categoria
+      </button>
+      
+      <button 
+        (click)="showDialog()" 
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm shadow-blue-200">
+        + Nova Transação
+      </button>
+    </div>
   </div>
 
   <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -41,7 +49,6 @@
 
       <ng-template pTemplate="body" let-t>
         <tr class="hover:bg-gray-50/80 transition-colors border-b border-gray-50 last:border-0">
-          
           <td class="pl-6 py-4">
             <div class="flex items-center gap-3">
               <div [class]="t.type === 'EXPENSE' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'" 
@@ -53,39 +60,27 @@
               </div>
             </div>
           </td>
-
           <td class="py-4">
             <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100/80 border border-gray-200">
               <div class="w-1.5 h-1.5 rounded-full bg-gray-500"></div>
               <span class="text-xs font-medium text-gray-600">{{ t.category?.name }}</span>
             </div>
           </td>
-
-          <td class="py-4 text-sm text-gray-500 font-medium">
-            {{ t.date | date:'dd MMM, yyyy' }}
-          </td>
-
+          <td class="py-4 text-sm text-gray-500 font-medium">{{ t.date | date:'dd MMM, yyyy' }}</td>
           <td class="py-4 text-center">
-            <span 
-              class="inline-flex items-center justify-center px-2 py-1 rounded text-xs font-semibold border"
-              [ngClass]="{
-                'bg-green-50 text-green-700 border-green-100': t.type === 'INCOME',
-                'bg-red-50 text-red-700 border-red-100': t.type === 'EXPENSE'
-              }">
+            <span class="inline-flex items-center justify-center px-2 py-1 rounded text-xs font-semibold border"
+              [ngClass]="{'bg-green-50 text-green-700 border-green-100': t.type === 'INCOME', 'bg-red-50 text-red-700 border-red-100': t.type === 'EXPENSE'}">
               {{ t.type === 'INCOME' ? 'Entrada' : 'Saída' }}
             </span>
           </td>
-
           <td class="pr-6 py-4 text-right">
-            <span 
-              class="text-sm font-bold tabular-nums tracking-tight"
+            <span class="text-sm font-bold tabular-nums tracking-tight"
               [ngClass]="t.type === 'INCOME' ? 'text-green-600' : 'text-gray-900'">
               {{ t.type === 'EXPENSE' ? '-' : '+' }} {{ t.amount | currency:'BRL' }}
             </span>
           </td>
         </tr>
       </ng-template>
-
       <ng-template pTemplate="emptymessage">
         <tr>
           <td colspan="5" class="text-center py-12">
@@ -120,108 +115,91 @@
   </ng-template>
 
   <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6 pt-6 px-5">
-    
     <div class="w-full bg-gray-100 p-1.5 rounded-xl border border-gray-200/50">
-      <p-selectButton 
-        [options]="typeOptions" 
-        formControlName="type" 
-        optionLabel="label" 
-        optionValue="value" 
-        styleClass="w-full grid grid-cols-2 gap-1 border-0"> 
-      </p-selectButton>
+      <p-selectButton [options]="typeOptions" formControlName="type" optionLabel="label" optionValue="value" styleClass="w-full grid grid-cols-2 gap-1 border-0"></p-selectButton>
     </div>
 
     <div class="flex flex-col gap-2">
       <label for="desc" class="text-sm font-semibold text-gray-700 ml-1">Descrição</label>
-      <input 
-        pInputText 
-        id="desc" 
-        formControlName="description" 
-        placeholder="Ex: Supermercado Semanal" 
-        class="w-full h-11 bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-gray-900 focus:bg-white transition-all rounded-xl px-4 text-gray-800 placeholder:text-gray-400" 
-        [ngClass]="{'ring-red-300 bg-red-50 focus:ring-red-500': transactionForm.get('description')?.invalid && transactionForm.get('description')?.touched}"
-      />
-      <small *ngIf="transactionForm.get('description')?.invalid && transactionForm.get('description')?.touched" class="text-red-500 text-xs ml-1 font-medium">
-        Informe uma descrição válida (mínimo 3 letras).
-      </small>
+      <input pInputText id="desc" formControlName="description" placeholder="Ex: Supermercado Semanal" class="w-full h-11 bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-gray-900 focus:bg-white transition-all rounded-xl px-4 text-gray-800 placeholder:text-gray-400" [ngClass]="{'ring-red-300 bg-red-50 focus:ring-red-500': transactionForm.get('description')?.invalid && transactionForm.get('description')?.touched}"/>
+      <small *ngIf="transactionForm.get('description')?.invalid && transactionForm.get('description')?.touched" class="text-red-500 text-xs ml-1 font-medium">Informe uma descrição válida (mínimo 3 letras).</small>
     </div>
 
     <div class="grid grid-cols-2 gap-5">
       <div class="flex flex-col gap-2">
         <label for="amount" class="text-sm font-semibold text-gray-700 ml-1">Valor</label>
-        <p-inputNumber 
-          id="amount" 
-          formControlName="amount" 
-          mode="currency" 
-          currency="BRL" 
-          locale="pt-BR" 
-          placeholder="R$ 0,00" 
-          class="w-full"
-          class="w-full"
-          inputStyleClass="w-full h-11 bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-gray-900 focus:bg-white transition-all rounded-xl px-4 font-bold text-gray-800"
-          [ngClass]="{'ng-invalid ng-dirty': transactionForm.get('amount')?.invalid && transactionForm.get('amount')?.touched}">
-        </p-inputNumber>
-        <small *ngIf="transactionForm.get('amount')?.invalid && transactionForm.get('amount')?.touched" class="text-red-500 text-xs ml-1 font-medium">
-          Valor é obrigatório.
-        </small>
+        <p-inputNumber id="amount" formControlName="amount" mode="currency" currency="BRL" locale="pt-BR" placeholder="R$ 0,00" class="w-full" inputStyleClass="w-full h-11 bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-gray-900 focus:bg-white transition-all rounded-xl px-4 font-bold text-gray-800" [ngClass]="{'ng-invalid ng-dirty': transactionForm.get('amount')?.invalid && transactionForm.get('amount')?.touched}"></p-inputNumber>
       </div>
-
       <div class="flex flex-col gap-2">
         <label for="date" class="text-sm font-semibold text-gray-700 ml-1">Data</label>
-        <p-datepicker 
-          formControlName="date" 
-          dateFormat="dd/mm/yy" 
-          [showIcon]="true" 
-          appendTo="body" 
-          [keepInvalid]="true" 
-          placeholder="dd/mm/aaaa"
-          styleClass="w-full"
-          class="w-full"
-          inputStyleClass="h-11 bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-gray-900 focus:bg-white transition-all rounded-l-xl px-4 font-medium text-gray-700"
-          [ngClass]="{'ng-invalid ng-dirty': transactionForm.get('date')?.invalid && transactionForm.get('date')?.touched}">
-        </p-datepicker>
-
-        @if (transactionForm.get('date')?.invalid && transactionForm.get('date')?.touched) {
-          <small class="text-red-500 text-xs ml-1 font-medium">
-            Data inválida.
-          </small>
-        }
+        <p-datepicker formControlName="date" dateFormat="dd/mm/yy" [showIcon]="true" appendTo="body" [keepInvalid]="true" placeholder="dd/mm/aaaa" styleClass="w-full" inputStyleClass="h-11 bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-gray-900 focus:bg-white transition-all rounded-l-xl px-4 font-medium text-gray-700" [ngClass]="{'ng-invalid ng-dirty': transactionForm.get('date')?.invalid && transactionForm.get('date')?.touched}"></p-datepicker>
       </div>
-</div>
+    </div>
 
-<div class="flex flex-col gap-2">
-  <label for="category" class="text-sm font-semibold text-gray-700 ml-1">Categoria</label>
-      <p-select 
-        [options]="categories()" 
-        formControlName="categoryId" 
-        optionLabel="name" 
-        placeholder="Selecione..." 
-        class="w-full h-11 items-center bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-gray-900 rounded-xl px-3"
-        class="w-full"
-        appendTo="body"
-        [ngClass]="{'ring-red-300 bg-red-50': transactionForm.get('categoryId')?.invalid && transactionForm.get('categoryId')?.touched}">
-      </p-select>
-      <small *ngIf="transactionForm.get('categoryId')?.invalid && transactionForm.get('categoryId')?.touched" class="text-red-500 text-xs ml-1 font-medium">
-        Selecione uma categoria.
-      </small>
+    <div class="flex flex-col gap-2">
+      <label for="category" class="text-sm font-semibold text-gray-700 ml-1">Categoria</label>
+      <p-select [options]="categories()" formControlName="categoryId" optionLabel="name" placeholder="Selecione..." class="w-full" appendTo="body" [ngClass]="{'ring-red-300 bg-red-50': transactionForm.get('categoryId')?.invalid && transactionForm.get('categoryId')?.touched}"></p-select>
     </div>
 
     <div class="flex justify-end gap-3 mt-4 py-6 border-t border-gray-100">
+      <button type="button" pButton label="Cancelar" class="p-button-text text-gray-500 hover:text-gray-900 hover:bg-gray-100 font-semibold px-5 rounded-lg transition-colors" (click)="displayModal.set(false)" [disabled]="isSubmitting()"></button>
+      <button type="submit" pButton [label]="isSubmitting() ? 'Salvando...' : 'Salvar Transação'" [loading]="isSubmitting()" [disabled]="transactionForm.invalid || isSubmitting()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm shadow-blue-200 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"></button>
+    </div>
+  </form>
+</p-dialog>
+
+<p-dialog 
+  [(visible)]="displayCategoryModal" 
+  [modal]="true" 
+  [breakpoints]="{'960px': '75vw', '640px': '95vw'}"
+  [style]="{ width: '100%', maxWidth: '400px' }" 
+  [draggable]="false" 
+  [resizable]="false"
+  [dismissableMask]="true"
+  styleClass="p-dialog-rounded overflow-hidden shadow-2xl">
+  
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-4 w-full py-5 px-5">
+      <div class="flex flex-col">
+        <h3 class="font-bold text-gray-900 text-xl tracking-tight">Nova Categoria</h3>
+        <p class="text-sm text-gray-500 font-medium">Crie uma nova categoria para organizar seus gastos</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <form [formGroup]="categoryForm" (ngSubmit)="onCategorySubmit()" class="flex flex-col gap-6 pt-2 px-5">
+    
+    <div class="flex flex-col gap-2">
+      <label for="catName" class="text-sm font-semibold text-gray-700 ml-1">Nome da Categoria</label>
+      <input 
+        pInputText 
+        id="catName" 
+        formControlName="name" 
+        placeholder="Ex: Lazer, Educação" 
+        class="w-full h-11 bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-gray-900 focus:bg-white transition-all rounded-xl px-4 text-gray-800 placeholder:text-gray-400" 
+        [ngClass]="{'ring-red-300 bg-red-50 focus:ring-red-500': categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched}"
+      />
+      <small *ngIf="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched" class="text-red-500 text-xs ml-1 font-medium">
+        Nome obrigatório (mínimo 3 letras).
+      </small>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-2 py-6 border-t border-gray-100">
       <button 
         type="button" 
         pButton 
         label="Cancelar" 
         class="p-button-text text-gray-500 hover:text-gray-900 hover:bg-gray-100 font-semibold px-5 rounded-lg transition-colors" 
-        (click)="displayModal.set(false)"
-        [disabled]="isSubmitting()">
+        (click)="displayCategoryModal.set(false)"
+        [disabled]="isSubmittingCategory()">
       </button>
       
       <button 
         type="submit" 
         pButton 
-        [label]="isSubmitting() ? 'Salvando...' : 'Salvar Transação'" 
-        [loading]="isSubmitting()" 
-        [disabled]="transactionForm.invalid || isSubmitting()"
+        [label]="isSubmittingCategory() ? 'Criando...' : 'Criar Categoria'" 
+        [loading]="isSubmittingCategory()" 
+        [disabled]="categoryForm.invalid || isSubmittingCategory()"
         class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm shadow-blue-200 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
       </button>
     </div>
